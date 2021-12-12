@@ -1,0 +1,9 @@
+config
+target
+bin
+maticwallet
+maticwallet*
+*.sh
+*.jar
+*.pl
+*.bak
