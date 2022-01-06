@@ -34,6 +34,7 @@ public class Start {
 		boolean debug = false;
 		int theGraphPollFrequencyInSeconds = 60;
 		int confirmTimeInSecondsBeforeRetry = 20;
+		int txRetryThreshold = 3;
 
 		// Initialize pet settings
 		GotchiSettings settings = null;
@@ -166,7 +167,7 @@ public class Start {
 			int txCounter = 0;
 			boolean txAttemptsCompleted = false;
 			boolean txConfirmed = false;
-			while (!txAttemptsCompleted && txCounter <= 10) {
+			while (!txAttemptsCompleted && txCounter <= txRetryThreshold) {
 				// gotchi pet request (Function: interact(uint256[] _tokenIds) ***)
 				String petRequest = settings.getPetMethodID()                                   // methodID for PET action (default 0x22c67519)
 						+ FormatUtils.makeUINT256WithDec2Hex(32)                                // uint256 param1, 32 = 0x20
