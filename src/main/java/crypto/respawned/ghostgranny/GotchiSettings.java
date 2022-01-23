@@ -7,17 +7,21 @@ import crypto.forestfish.utils.SystemUtils;
 
 public class GotchiSettings {
 
-    private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d";
+    // Specific
     private String petMethodID = "0x22c67519";
-    private String gasLimit = "200000";
+    private ArrayList<Integer> tokenIDs = new ArrayList<Integer>();
     private boolean haMode = false;
     
+	// Generic
+    private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d";
+    private String gasLimit = "200000";
+    
+    // Wallet
     private String theGraphQueryEndpointURI = "https://api.thegraph.com/subgraphs/name/aavegotchi/aavegotchi-core-matic";
     private String providerURL = "";
     private String walletAddress = "";
     private String walletMnemonic = "N/A"; // only needed once to create the wallet if it does not exist
     private String walletPrivKey = "N/A"; // only needed once to create the wallet if it does not exist
-    private ArrayList<Integer> tokenIDs = new ArrayList<Integer>();
     
     public GotchiSettings() {
         super();

@@ -162,39 +162,21 @@ public class Start {
 			SystemUtils.sleepInSeconds(20);
 
 			/**
-			 *  Perform the pet action if the time is right
+			 * Prepare the request hex data
 			 */
-			int txCounter = 0;
-			boolean txAttemptsCompleted = false;
-			boolean txConfirmed = false;
-			while (!txAttemptsCompleted && txCounter <= txRetryThreshold) {
-				// gotchi pet request (Function: interact(uint256[] _tokenIds) ***)
-				String petRequest = settings.getPetMethodID()                                   // methodID for PET action (default 0x22c67519)
-						+ FormatUtils.makeUINT256WithDec2Hex(32)                                // uint256 param1, 32 = 0x20
-						+ FormatUtils.makeUINT256WithDec2Hex(settings.getTokenIDs().size());    // uint256 param2, 5 = 0x5 (nr of gotchis to pet)
-
-				for (Integer tokenID: settings.getTokenIDs()) {
-					petRequest = petRequest + FormatUtils.makeUINT256WithDec2Hex(tokenID);      // uint256 param3, tokenID 5972 = 0x1754
-				}
-
-				LOGGER.info("Sending PETALL petRequest: " + petRequest);
-				String txHASH = EVMUtils.sendTX(maticWeb3j, maticBlockChain, maticWallet, settings.getAavegotchiContractAddress(), petRequest, confirmTimeInSecondsBeforeRetry, settings.getGasLimit());
-				if (null == txHASH) {
-					LOGGER.warn("Transaction failed, will sleep 10 seconds and try again (attempt #" + txCounter + ")");
-					SystemUtils.sleepInSeconds(10);
-					txCounter++;
-				} else {
-					System.out.println("txHASH: " + txHASH);
-					txAttemptsCompleted = true;
-					txConfirmed = true;
-				}
-
-				if (!txAttemptsCompleted && txCounter == 20) {
-					LOGGER.warn("Unable to get a transaction receipt after multiple attempts .. we can still check if kinship still got bumped");
-				}
-
+			// gotchi pet request (Function: interact(uint256[] _tokenIds) ***)
+			String petRequest_hexData = settings.getPetMethodID()                           // methodID for PET action (default 0x22c67519)
+					+ FormatUtils.makeUINT256WithDec2Hex(32)                                // uint256 param1, 32 = 0x20
+					+ FormatUtils.makeUINT256WithDec2Hex(settings.getTokenIDs().size());    // uint256 param2, 5 = 0x5 (nr of gotchis to pet)
+			for (Integer tokenID: settings.getTokenIDs()) {
+				petRequest_hexData = petRequest_hexData + FormatUtils.makeUINT256WithDec2Hex(tokenID);      // uint256 param3, tokenID 5972 = 0x1754
 			}
-
+			
+			/**
+			 *  Perform the pet action
+			 */
+			boolean txAttemptsCompleted = EVMUtils.makeRequest(petRequest_hexData, txRetryThreshold, confirmTimeInSecondsBeforeRetry, maticWeb3j, maticBlockChain, maticWallet, settings.getAavegotchiContractAddress(), settings.getGasLimit());
+			
 			/**
 			 * Check the graph again for kinship increase
 			 */
@@ -245,7 +227,7 @@ public class Start {
 						} else {
 
 							if (kinshipBumpRetryCounter > 200) {
-								if (!txConfirmed) {
+								if (!txAttemptsCompleted) {
 									LOGGER.warn("We were not sure if the transaction went through, and now seems it didnt since kinship is not bumped. Granny needs help.");
 									LOGGER.warn("Granny still needs to keep trying though .. loopin");
 								} else {
