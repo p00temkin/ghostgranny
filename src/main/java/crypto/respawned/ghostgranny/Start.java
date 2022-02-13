@@ -180,6 +180,7 @@ public class Start {
 			/**
 			 * Check the graph again for kinship increase
 			 */
+			boolean grannyTriedSleepin = false;
 			if (txAttemptsCompleted) {
 				String graphqlQuery = "{user(id:\"" + settings.getWalletAddress().toLowerCase() + "\") {gotchisOwned{id,name,kinship,lastInteracted},id}}";
 				String url = settings.getTheGraphQueryEndpointURI();
@@ -231,8 +232,14 @@ public class Start {
 									LOGGER.warn("We were not sure if the transaction went through, and now seems it didnt since kinship is not bumped. Granny needs help.");
 									LOGGER.warn("Granny still needs to keep trying though .. loopin");
 								} else {
-									LOGGER.error("So transaction went through ... but the graph does not reflect our love and we checked " + kinshipBumpRetryCounter + " times. Grannys goin to bed.");
-									SystemUtils.halt();
+									if (grannyTriedSleepin) {
+										LOGGER.error("So transaction went through ... but the graph does not reflect our love and we checked " + kinshipBumpRetryCounter + " times. Subgraph might be out of sync. Grannys goin to bed for 60 minutes.");
+										grannyTriedSleepin = true;
+										SystemUtils.sleepInSeconds(3600);
+									} else {
+										LOGGER.error("So transaction went through ... but the graph does not reflect our love and we checked " + kinshipBumpRetryCounter + " times. Subgraph might be out of sync. Grannys goin to bed .. giving up until cpr.");
+										SystemUtils.halt();
+									}
 								}
 							} else {
 								LOGGER.warn("The bump didnt work?? .. perhaps we just need to wait for the graph to sync .. retrying in 10 seconds");
