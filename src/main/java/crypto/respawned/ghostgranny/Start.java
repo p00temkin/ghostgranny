@@ -21,6 +21,7 @@ import crypto.forestfish.objects.evm.EVMWalletBalance;
 import crypto.forestfish.utils.EVMUtils;
 import crypto.forestfish.utils.FormatUtils;
 import crypto.forestfish.utils.GraphQLUtils;
+import crypto.forestfish.utils.NumUtils;
 import crypto.forestfish.utils.SystemUtils;
 import reactor.core.publisher.Mono;
 
@@ -75,6 +76,7 @@ public class Start {
 			 *  Poll the graph until we know all owned/specified gotchis needs a pet
 			 */
 			boolean allGotchisNeedsLove = false;
+			int allGotchisNeedsLoveCounter = 0;
 			while (!allGotchisNeedsLove) {
 
 				// lets start by assuming all are in need
@@ -136,8 +138,14 @@ public class Start {
 								LOGGER.info("The gotchi " + gotchi.getName() + " is ready for a hug!");
 								gotchisNeedHugCount++;
 							} else {
-								allGotchisNeedsLove = false;
-								gotchisAlreadyHuggedCount++;
+								if (settings.isForcepet()) {
+									LOGGER.info("The gotchi " + gotchi.getName() + " is getting FORCED hugged");
+									gotchisNeedHugCount++;
+								} else {
+									allGotchisNeedsLove = false;
+									gotchisAlreadyHuggedCount++;
+								}
+
 							}
 					}
 					settings.setTokenIDs(tokenIDsFromTheGraph);
@@ -145,10 +153,21 @@ public class Start {
 					// If a single/few gotchi(s) trail the rest, let them catchup and hug the majority
 					// TODO: reconsider if the minority gotchi has epic kinship?
 					if (!allGotchisNeedsLove && (gotchisNeedHugCount >= gotchisAlreadyHuggedCount)) {
-						allGotchisNeedsLove = true;
+						if (settings.getExtraDelay() == 0) {
+							allGotchisNeedsLove = true;
+							allGotchisNeedsLoveCounter++;
+						} else {
+							if (allGotchisNeedsLoveCounter>1) {
+								allGotchisNeedsLove = true;
+							} else {
+								LOGGER.info("All gotchi need love, but im holdin that love for an additional " + settings.getExtraDelay() + " seconds");
+								SystemUtils.sleepInSeconds(settings.getExtraDelay());
+							}
+							allGotchisNeedsLoveCounter++;
+						}
 					}
 
-					if (minTimeUntilPet <= 60L) {
+					if ( (minTimeUntilPet <= 60L) || settings.isForcepet()) {
 						LOGGER.info(".... micro sleeping 5 seconds");
 						SystemUtils.sleepInSeconds(5);
 					} else {
@@ -158,8 +177,10 @@ public class Start {
 
 				}
 			}
-			LOGGER.info("In 20 seconds granny will cuddle with the following gotchis: " + settings.getTokenIDs().toString());
-			SystemUtils.sleepInSeconds(20);
+			
+			int randSleep = NumUtils.randomNumWithinRangeAsInt(5, 20);
+			LOGGER.info("In " + randSleep + " seconds granny will cuddle with the following gotchis: " + settings.getTokenIDs().toString());
+			SystemUtils.sleepInSeconds(randSleep);
 
 			/**
 			 * Prepare the request hex data
@@ -291,7 +312,15 @@ public class Start {
 		// hamode
 		Option haMode = new Option("x", "hamode", false, "High Availability mode (removes warning messages caused by running multiple grannies)");
 		options.addOption(haMode);
+		
+		// forcepet
+		Option forcepet = new Option("o", "forcepet", false, "Override and force pet gotchis");
+		options.addOption(forcepet);
 
+		// extradelay
+		Option extradelay = new Option("e", "extradelay", true, "Extra delay in seconds");
+		options.addOption(extradelay);
+		
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd;
@@ -304,6 +333,8 @@ public class Start {
 			if (cmd.hasOption("w")) settings.setWalletAddress(cmd.getOptionValue("wallet"));
 			if (cmd.hasOption("g")) settings.setGasLimit(cmd.getOptionValue("gaslimit"));
 			if (cmd.hasOption("x")) settings.setHaMode(true);
+			if (cmd.hasOption("o")) settings.setForcepet(true);
+			if (cmd.hasOption("e")) settings.setExtraDelay(Integer.parseInt(cmd.getOptionValue("extradelay")));
 
 			if (cmd.hasOption("t")) {
 				for (String tokenID: cmd.getOptionValue("tokenids").split(",")) {

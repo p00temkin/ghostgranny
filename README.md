@@ -20,7 +20,7 @@ mvn clean package install
    
 ### Usage
 
-With a wallet address 0xABC, an Infura MATIC Provider URL https://polygon-mainnet.infura.io/v3/abc, start an infinate 12 hour petting loop by running:
+With a wallet address 0xABC, a MATIC RPC Provider URL (from Infura, Pokt, QuickNode, ..), start an infinate petting loop by running:
 
    ```
    java -jar ./ghostgranny.jar -w 0xABC -p "https://polygon-mainnet.infura.io/v3/abc"
@@ -38,6 +38,8 @@ Options:
  -f,--petmethodid <arg>      Aavegotchi pet method id/function address (default 0x22c67519)
  -l,--gaslimit <arg>         Gas limit for the MATIC network
  -x,--hamode                 High Availability mode (removes warning messages caused by running multiple grannies)
+ -o,--forcepet               Override timeout check and pet all owned gotchis instantly
+ -e,--extradelay            Extra sleep delay to be used in hamode to avoid granny clash
    ```
    
 ### Support/Donate

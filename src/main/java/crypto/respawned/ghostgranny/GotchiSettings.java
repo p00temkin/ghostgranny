@@ -11,6 +11,8 @@ public class GotchiSettings {
     private String petMethodID = "0x22c67519";
     private ArrayList<Integer> tokenIDs = new ArrayList<Integer>();
     private boolean haMode = false;
+    private boolean forcepet = false;
+    private int extraDelay = 0;
     
 	// Generic
     private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d";
@@ -110,6 +112,22 @@ public class GotchiSettings {
 	public void setWalletPrivKey(String walletPrivKey) {
 		this.walletPrivKey = walletPrivKey;
 	}
+	
+	public boolean isForcepet() {
+		return forcepet;
+	}
+
+	public void setForcepet(boolean forcepet) {
+		this.forcepet = forcepet;
+	}
+
+	public int getExtraDelay() {
+		return extraDelay;
+	}
+
+	public void setExtraDelay(int extraDelay) {
+		this.extraDelay = extraDelay;
+	}
 
 	public void print() {
         System.out.println("Settings:");
@@ -119,6 +137,8 @@ public class GotchiSettings {
         System.out.println(" - walletPrivkey: " + this.getWalletPrivKey());
         System.out.println(" - tokenIDs: " + this.getTokenIDs().toString());
         System.out.println(" - haMode: " + this.isHaMode());
+        System.out.println(" - haMode: " + this.isHaMode());
+        System.out.println(" - extradelay: " + this.getExtraDelay());
         
         System.out.println(" - aavegotchiContractAddress: " + this.getAavegotchiContractAddress());
         System.out.println(" - theGraphQueryEndpointURI: " + this.getTheGraphQueryEndpointURI());
