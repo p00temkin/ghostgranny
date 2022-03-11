@@ -39,7 +39,7 @@ Options:
  -l,--gaslimit <arg>         Gas limit for the MATIC network
  -x,--hamode                 High Availability mode (removes warning messages caused by running multiple grannies)
  -o,--forcepet               Override timeout check and pet all owned gotchis instantly
- -e,--extradelay            Extra sleep delay to be used in hamode to avoid granny clash
+ -e,--extradelay             Extra sleep delay to be used in hamode to avoid granny clash
    ```
    
 ### Support/Donate
