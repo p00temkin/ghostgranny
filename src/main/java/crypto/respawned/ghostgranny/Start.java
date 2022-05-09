@@ -64,7 +64,10 @@ public class Start {
 		if (null == maticWallet) maticWallet = new EVMLocalWallet("maticwallet", WalletOrigin.EXISTING_LOCALWALLETFILE, "nopassword", settings.getWalletMnemonic());
 		
 		EVMWalletBalance walletBalance = EVMUtils.getWalletBalanceMain(maticWeb3j, maticBlockChain, maticWallet);
-		if (walletBalance.getBalanceInWEI().intValue() == 0) {
+		if (null == walletBalance) {
+			LOGGER.error("Unable to get wallet balance, exiting");
+			SystemUtils.halt();
+		} else if (walletBalance.getBalanceInWEI().intValue() == 0) {
 			LOGGER.error("wallet " + maticWallet.getCredentials().getAddress() + " has no funds! We gotta spend to pet.");
 			SystemUtils.halt();
 		}
