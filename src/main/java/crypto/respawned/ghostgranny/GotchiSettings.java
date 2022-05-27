@@ -15,7 +15,7 @@ public class GotchiSettings {
     private int extraDelay = 0;
     
 	// Generic
-    private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d";
+    private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d"; // AavegotchiGameFacet.sol, function interact(uint256[] calldata _tokenIds)
     private String gasLimit = "200000";
     
     // Wallet

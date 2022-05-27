@@ -154,7 +154,7 @@ public class Start {
 					settings.setTokenIDs(tokenIDsFromTheGraph);
 
 					// If a single/few gotchi(s) trail the rest, let them catchup and hug the majority
-					// TODO: reconsider if the minority gotchi has epic kinship?
+					// reconsider if the minority gotchi has epic kinship?
 					if (!allGotchisNeedsLove && (gotchisNeedHugCount >= gotchisAlreadyHuggedCount)) {
 						if (settings.getExtraDelay() == 0) {
 							allGotchisNeedsLove = true;
@@ -170,7 +170,7 @@ public class Start {
 						}
 					}
 
-					if ( (minTimeUntilPet <= 60L) || settings.isForcepet()) {
+					if ((minTimeUntilPet <= 60L) || settings.isForcepet()) {
 						LOGGER.info(".... micro sleeping 5 seconds");
 						SystemUtils.sleepInSeconds(5);
 					} else {
