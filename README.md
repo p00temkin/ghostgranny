@@ -32,15 +32,18 @@ Options:
    ```
  -p,--providerurl <arg>      MATIC Provider URL (infura etc)
  -t,--tokenids <arg>         csv decimal list of gotchi token ids (used unless wallet specified)
- -m,--walletmnemonic <arg>   Wallet mnemonic
- -k,--walletprivkey <arg>    Wallet private key 
- -w,--wallet <arg>           Wallet address 
+ -m,--walletmnemonic <arg>   Wallet mnemonic (ghostgranny wallet)
+ -k,--walletprivkey <arg>    Wallet private key (ghostgranny wallet)
+ -w,--wallet <arg>           Wallet address (public address of wallet which owns the gotchis)
  -f,--petmethodid <arg>      Aavegotchi pet method id/function address (default 0x22c67519)
  -l,--gaslimit <arg>         Gas limit for the MATIC network
  -x,--hamode                 High Availability mode (removes warning messages caused by running multiple grannies)
  -o,--forcepet               Override timeout check and pet all owned gotchis instantly
  -e,--extradelay             Extra sleep delay to be used in hamode to avoid granny clash
    ```
+
+### Note on Safety
+Recommended setup is to run ghostgranny with a wallet which does not own any gotchis. Instead, fund a separate wallet with a small amount of MATIC to cover gas fees, and enable to "Pet Operator" for your ghostgranny wallet address as described in https://programmablewealth.com/how-to-automate-aavegotchi-petting-with-pet-operator-and-gelato/ under the section "Enable Pet Operator permission with louper.dev".  
    
 ### Support/Donate
 
