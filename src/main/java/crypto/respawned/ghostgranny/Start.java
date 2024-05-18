@@ -13,6 +13,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.esaulpaugh.headlong.abi.Single;
 import com.esaulpaugh.headlong.abi.Tuple;
 
 import crypto.forestfish.enums.evm.EVMChain;
@@ -53,8 +54,13 @@ public class Start {
 		/**
 		 *  Initialize connection to POLYGON network
 		 */
-		EVMBlockChainConnector connector = new EVMBlockChainConnector(EVMChain.POLYGON, true);
-
+		EVMBlockChainConnector connector = null;
+		if (settings.getProviderURL().startsWith("htt")) {
+			connector = new EVMBlockChainConnector(EVMChain.POLYGON, settings.getProviderURL(), true);
+		} else {
+			connector = new EVMBlockChainConnector(EVMChain.POLYGON, true);
+		}
+		
 		/**
 		 *  Make sure granny wallet has funds
 		 */
@@ -110,7 +116,7 @@ public class Start {
 				bigints[tokenoffset] = BigInteger.valueOf(tokenID);
 				tokenoffset++;
 			}
-			Tuple function_args = Tuple.singleton(bigints);
+			Tuple function_args = Single.of(bigints);
 			ByteBuffer bb = func.encodeCall(function_args);
 			String petRequest_hexDataABI = "0x" + CryptUtils.encodeHexString(bb.array());
 
@@ -139,7 +145,7 @@ public class Start {
 			 *  Perform the hug (pet interact() call)
 			 */
 			System.out.println("petRequest_hexData: " + petRequest_hexData);
-			boolean txAttemptsCompleted = EVMUtils.makeSignedRequest(petRequest_hexData, settings.getTxRetryThreshold(), settings.getConfirmTimeInSecondsBeforeRetry(), connector, grannywallet.getCredentials(), settings.getAavegotchiContractAddress(), gasLimit.toString(), settings.isHaltOnUnconfirmedTX());
+			String txHASH = EVMUtils.makeSignedRequest(petRequest_hexData, settings.getTxRetryThreshold(), settings.getConfirmTimeInSecondsBeforeRetry(), connector, grannywallet.getCredentials(), settings.getAavegotchiContractAddress(), gasLimit.toString(), settings.isHaltOnUnconfirmedTX());
 			
 			/**
 			 * Check the graph again for kinship increase
@@ -147,7 +153,7 @@ public class Start {
 			LOGGER.info("Lets wait 20 seconds for theGraph to get updated..");
 			SystemUtils.sleepInSeconds(20);
 			int gotchisBumped = 0;
-			if (txAttemptsCompleted) {
+			if (null != txHASH) {
 				GotchiGraphQLState gotchiGraphQLStatePOST = GrannyUtils.getGotchiState(settings, firstAttempt);
 
 				// Finally verify kinship has bumped for at least 1 gotchi
