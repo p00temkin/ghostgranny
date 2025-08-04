@@ -135,7 +135,7 @@ public class Start {
 			 * Roughly adjust gaslimit to your gotchi count (varies due to multiple factors, rented/owned etc)
 			 */
 			Integer gasLimit = Integer.parseInt(connector.getChaininfo().getFallbackGasLimitInUnits());
-			Integer extraGas = 2000 * NumUtils.getNearestMultipleOf10(settings.getTokenIDs().size());
+			Integer extraGas = 50000 * NumUtils.getNearestMultipleOf10(settings.getTokenIDs().size());
 			if (extraGas > 0) {
 				gasLimit = gasLimit + extraGas;
 				LOGGER.info("We have a bunch of gotchis so bumping the gaslimit with an extra " + extraGas);

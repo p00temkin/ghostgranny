@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>crypto.respawned</groupId>
 	<artifactId>ghostgranny</artifactId>
-	<version>0.2.40</version>
+	<version>0.2.41</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@
 	<dependency>
 		<groupId>crypto.forestfish</groupId>
 		<artifactId>forestfish</artifactId>
-		<version>0.2.40</version>
+		<version>0.2.41</version>
 	</dependency>
 	<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
