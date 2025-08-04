@@ -8,7 +8,7 @@ import crypto.forestfish.utils.SystemUtils;
 public class GotchiSettings {
 
     // Aavegotchi Specific
-    private String petMethodID = "0x22c67519";
+    private String petMethodID = "0x22c67519"; // same ABI on polygon/base
     private ArrayList<Integer> tokenIDs = new ArrayList<Integer>();
     private boolean haMode = false;
     private int extraDelay = 0;
@@ -20,12 +20,12 @@ public class GotchiSettings {
 	private boolean forcePetAll = false; // DEBUG purposes only
 
 	// Blockchain
-    private String aavegotchiContractAddress = "0x86935f11c86623dec8a25696e1c19a8659cbf95d"; // AavegotchiGameFacet.sol, function interact(uint256[] calldata _tokenIds)
+    private String aavegotchiContractAddress = "0xA99c4B08201F2913Db8D28e71d020c4298F29dBF"; // AavegotchiGameFacet.sol, function interact(uint256[] calldata _tokenIds), polygon: 0x86935f11c86623dec8a25696e1c19a8659cbf95d
     private String providerURL = "";
     
     // TheGraph
     //private String theGraphQueryEndpointURI = "https://api.thegraph.com/subgraphs/name/aavegotchi/aavegotchi-core-matic";
-    private String theGraphQueryEndpointURI = "https://subgraph.satsuma-prod.com/tWYl5n5y04oz/aavegotchi/aavegotchi-core-matic/api";
+    private String theGraphQueryEndpointURI = "https://subgraph.satsuma-prod.com/tWYl5n5y04oz/aavegotchi/aavegotchi-core-base/api"; // polygon: https://subgraph.satsuma-prod.com/tWYl5n5y04oz/aavegotchi/aavegotchi-core-matic/api
     
     // Gotchi owner wallet
     private String ownerWalletAddress = "";

@@ -56,15 +56,15 @@ public class Start {
 		 */
 		EVMBlockChainConnector connector = null;
 		if (settings.getProviderURL().startsWith("htt")) {
-			connector = new EVMBlockChainConnector(EVMChain.POLYGON, settings.getProviderURL(), true);
+			connector = new EVMBlockChainConnector(EVMChain.BASE, settings.getProviderURL(), true);
 		} else {
-			connector = new EVMBlockChainConnector(EVMChain.POLYGON, true);
+			connector = new EVMBlockChainConnector(EVMChain.BASE, true);
 		}
 		
 		/**
 		 *  Make sure granny wallet has funds
 		 */
-		EVMUtils.ensureWalletHasFunds(connector, grannywallet, 0.5d);
+		EVMUtils.ensureWalletHasFunds(connector, grannywallet, 0.0001d);
 		LOGGER.info("Ready to move with granny wallet " + grannywallet.getCredentials().getAddress());
 
 		/**
@@ -79,6 +79,7 @@ public class Start {
 		 * Infinite pet loop init
 		 */
 		boolean firstAttempt = true;
+		int tx_buy_still_fail_counter = 0;
 		while (true) {
 
 			/**
@@ -97,7 +98,7 @@ public class Start {
 			String petRequest_hexData = "";
 
 			// Manual method
-			String petRequest_hexDataMAN = settings.getPetMethodID()                           // methodID for PET action (default 0x22c67519)
+			String petRequest_hexDataMAN = settings.getPetMethodID()                        // methodID for PET action (default 0x22c67519)
 					+ FormatUtils.makeUINT256WithDec2Hex(32)                                // uint256 param1, 32 = 0x20
 					+ FormatUtils.makeUINT256WithDec2Hex(settings.getTokenIDs().size());    // uint256 param2, 5 = 0x5 (nr of gotchis to pet)
 			for (Integer tokenID: settings.getTokenIDs()) {
@@ -168,8 +169,9 @@ public class Start {
 						gotchisBumped++;
 					}
 				}
+				if (gotchisBumped == 0) tx_buy_still_fail_counter++;
 			}
-
+			
 			// Sanity check
 			if (gotchisBumped != settings.getTokenIDs().size()) {
 				LOGGER.warn("Mismatch on bumped kinship.");
@@ -186,6 +188,12 @@ public class Start {
 			// Debug early exit
 			if (settings.isForcePetAll()) {
 				LOGGER.warn("We just performed a forcedpet so grinding to a halt to protect our wallet");
+				SystemUtils.halt();
+			}
+			
+			// Infinite TX Loop protection
+			if (tx_buy_still_fail_counter > 10) {
+				LOGGER.error("We have made 10 successful tx but the gotchis doesnt seem to get pet. Are you allowed to pet??!");
 				SystemUtils.halt();
 			}
 			
