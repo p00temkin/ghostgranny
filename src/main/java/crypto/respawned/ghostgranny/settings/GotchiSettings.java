@@ -18,6 +18,9 @@ public class GotchiSettings {
 	private int txRetryThreshold = 3;
 	private boolean haltOnUnconfirmedTX = true;
 	private boolean forcePetAll = false; // DEBUG purposes only
+	
+	private boolean sadNotification = false;
+	private String sadURL = "";
 
 	// Blockchain
     private String aavegotchiContractAddress = "0xA99c4B08201F2913Db8D28e71d020c4298F29dBF"; // AavegotchiGameFacet.sol, function interact(uint256[] calldata _tokenIds), polygon: 0x86935f11c86623dec8a25696e1c19a8659cbf95d
@@ -150,6 +153,9 @@ public class GotchiSettings {
         System.out.println(" - theGraphQueryEndpointURI: " + this.getTheGraphQueryEndpointURI());
         System.out.println(" - thresholdForGotchiToCatchUpInSeconds: " + this.getThresholdForGotchiToCatchUpInSeconds());
         System.out.println(" - petMethodID: " + this.getPetMethodID());
+        System.out.println(" - theGraphPollFrequencyInSeconds: " + theGraphPollFrequencyInSeconds);
+        System.out.println(" - sadURL: " + this.getSadURL());
+        System.out.println(" - sadNotification: " + this.isSadNotification());
         System.out.println("");
     }
 
@@ -209,6 +215,22 @@ public class GotchiSettings {
 	public void setForcePetAll(boolean forcePetAll) {
 		this.forcePetAll = forcePetAll;
 	}
-    
+
+	public boolean isSadNotification() {
+		return sadNotification;
+	}
+
+	public void setSadNotification(boolean sadNotification) {
+		this.sadNotification = sadNotification;
+	}
+
+	public String getSadURL() {
+		return sadURL;
+	}
+
+	public void setSadURL(String sadURL) {
+		this.sadURL = sadURL;
+	}
+
     
 }

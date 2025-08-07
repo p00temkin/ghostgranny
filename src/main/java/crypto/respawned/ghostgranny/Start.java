@@ -25,6 +25,7 @@ import crypto.forestfish.utils.EVMUtils;
 import crypto.forestfish.utils.FormatUtils;
 import crypto.forestfish.utils.JSONUtils;
 import crypto.forestfish.utils.NumUtils;
+import crypto.forestfish.utils.SADUtils;
 import crypto.forestfish.utils.SystemUtils;
 import crypto.respawned.ghostgranny.objects.Gotchi;
 import crypto.respawned.ghostgranny.objects.GotchiGraphQLState;
@@ -79,7 +80,7 @@ public class Start {
 		 * Infinite pet loop init
 		 */
 		boolean firstAttempt = true;
-		int tx_buy_still_fail_counter = 0;
+		int tx_but_still_fail_counter = 0;
 		while (true) {
 
 			/**
@@ -120,7 +121,6 @@ public class Start {
 			Tuple function_args = Single.of(bigints);
 			ByteBuffer bb = func.encodeCall(function_args);
 			String petRequest_hexDataABI = "0x" + CryptUtils.encodeHexString(bb.array());
-
 
 			if (!petRequest_hexDataABI.equals(petRequest_hexDataMAN)) {
 				LOGGER.warn("Function parameter calculation mismatch, a custom pet method ID might have been called, using the manual hexdata");
@@ -169,7 +169,15 @@ public class Start {
 						gotchisBumped++;
 					}
 				}
-				if (gotchisBumped == 0) tx_buy_still_fail_counter++;
+				if (gotchisBumped == 0) {
+					tx_but_still_fail_counter++;
+				} else {
+					if (settings.isSadNotification()) {
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "Just performed pet with tx " + txHASH);
+						LOGGER.info("Pushing status update to SAD");
+					}
+				}
+				
 			}
 			
 			// Sanity check
@@ -179,8 +187,11 @@ public class Start {
 					LOGGER.warn("May be caused by multiple ghostgrannys .. will keep going after a quick 30s nap");
 					SystemUtils.sleepInSeconds(30);
 				} else {
-					LOGGER.warn("gotchisBumped: " + gotchisBumped);
-					LOGGER.warn("settings.getTokenIDs().size(): " + settings.getTokenIDs().size());
+					if (settings.isSadNotification()) {
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "ERROR: Mismatch on bumped kinship .. bumped " + gotchisBumped + " out of " + settings.getTokenIDs().size(), 86400);
+						LOGGER.info("Pushing status update to SAD");
+					}
+					LOGGER.warn("gotchisBumped: " + gotchisBumped + "settings.getTokenIDs().size(): " + settings.getTokenIDs().size());
 					SystemUtils.halt();
 				}
 			}
@@ -192,7 +203,11 @@ public class Start {
 			}
 			
 			// Infinite TX Loop protection
-			if (tx_buy_still_fail_counter > 10) {
+			if (tx_but_still_fail_counter >= 10) {
+				if (settings.isSadNotification()) {
+					SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "ERROR: We have made 10 successful tx but the gotchis doesnt seem to get pet. Are you allowed to pet??!", 86400);
+					LOGGER.info("Pushing status update to SAD");
+				}
 				LOGGER.error("We have made 10 successful tx but the gotchis doesnt seem to get pet. Are you allowed to pet??!");
 				SystemUtils.halt();
 			}
@@ -238,11 +253,19 @@ public class Start {
 		// extradelay
 		Option extradelay = new Option("e", "extradelay", true, "Extra delay in seconds");
 		options.addOption(extradelay);
+		
+		// graphpollfrequency
+		Option graphpollfrequency = new Option("o", "graphpollfrequency", true, "The graph poll frequency in seconds (default 60 seconds)");
+		options.addOption(graphpollfrequency);
 
 		// gotchicatchupthreshold
 		Option gotchicatchupthreshold = new Option("c", "gotchicatchupthreshold", true, "Gotchi catchup threshold in seconds");
 		options.addOption(gotchicatchupthreshold);
 
+		// sadurl
+		Option sadurl = new Option("s", "sadurl", true, "SAD URL");
+		options.addOption(sadurl);
+		
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd;
@@ -256,8 +279,14 @@ public class Start {
 			if (cmd.hasOption("p")) settings.setProviderURL(cmd.getOptionValue("providerurl"));
 			if (cmd.hasOption("x")) settings.setHaMode(true);
 			if (cmd.hasOption("e")) settings.setExtraDelay(Integer.parseInt(cmd.getOptionValue("extradelay")));
+			if (cmd.hasOption("o")) settings.setTheGraphPollFrequencyInSeconds(Integer.parseInt(cmd.getOptionValue("graphpollfrequency")));
 			if (cmd.hasOption("c")) settings.setThresholdForGotchiToCatchUpInSeconds(Integer.parseInt(cmd.getOptionValue("gotchicatchupthreshold")));
 
+			if (cmd.hasOption("s")) {
+				settings.setSadNotification(true);
+				settings.setSadURL(cmd.getOptionValue("sadurl"));
+			}
+			
 			if (!cmd.hasOption("g") && !cmd.hasOption("m") && !cmd.hasOption("k")) {
 				LOGGER.error("You must specify either -g, -k or -m to make granny take action");
 				formatter.printHelp(" ", options);
