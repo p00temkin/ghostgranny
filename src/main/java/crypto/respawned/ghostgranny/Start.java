@@ -26,6 +26,7 @@ import crypto.forestfish.utils.FormatUtils;
 import crypto.forestfish.utils.JSONUtils;
 import crypto.forestfish.utils.NumUtils;
 import crypto.forestfish.utils.SADUtils;
+import crypto.forestfish.utils.StringsUtils;
 import crypto.forestfish.utils.SystemUtils;
 import crypto.respawned.ghostgranny.objects.Gotchi;
 import crypto.respawned.ghostgranny.objects.GotchiGraphQLState;
@@ -91,6 +92,10 @@ public class Start {
 			int randSleep = NumUtils.randomNumWithinRangeAsInt(5, 20);
 			LOGGER.info("In " + randSleep + " seconds granny will cuddle with the following gotchis: " + settings.getTokenIDs().toString());
 			SystemUtils.sleepInSeconds(randSleep);
+			if (settings.isSadNotification()) {
+				SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: In " + randSleep + " seconds granny will cuddle with the following gotchis ..");
+				LOGGER.info("Pushing status update to SAD");
+			}
 
 			/**
 			 * Prepare the request hex data
@@ -173,7 +178,7 @@ public class Start {
 					tx_but_still_fail_counter++;
 				} else {
 					if (settings.isSadNotification()) {
-						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "Just performed pet with tx " + txHASH);
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: Just performed pet with tx " + StringsUtils.cutAndPadStringToN(txHASH, 30) + "..");
 						LOGGER.info("Pushing status update to SAD");
 					}
 				}
@@ -184,7 +189,7 @@ public class Start {
 			if (gotchisBumped != settings.getTokenIDs().size()) {
 				LOGGER.warn("Mismatch on bumped kinship.");
 				if (settings.isHaMode()) {
-					LOGGER.warn("May be caused by multiple ghostgrannys .. will keep going after a quick 30s nap");
+					LOGGER.warn("WARNING: Mismath on bumped kinship .. may be caused by multiple ghostgrannys so will keep going after a quick 30s nap");
 					SystemUtils.sleepInSeconds(30);
 				} else {
 					if (settings.isSadNotification()) {

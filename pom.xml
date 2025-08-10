@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>crypto.respawned</groupId>
 	<artifactId>ghostgranny</artifactId>
-	<version>0.2.43</version>
+	<version>0.2.44</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
