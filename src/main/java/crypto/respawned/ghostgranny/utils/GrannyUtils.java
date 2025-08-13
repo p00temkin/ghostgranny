@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import com.netflix.graphql.dgs.client.GraphQLResponse;
 
+import crypto.forestfish.utils.DateUtils;
 import crypto.forestfish.utils.GraphQLUtils;
+import crypto.forestfish.utils.SADUtils;
 import crypto.forestfish.utils.StringsUtils;
 import crypto.forestfish.utils.SystemUtils;
 import crypto.respawned.ghostgranny.objects.Gotchi;
@@ -93,6 +95,7 @@ public class GrannyUtils {
 
 					Long minTimeUntilPet = Long.MAX_VALUE;
 					
+					Long maxtimeUntilPet = Long.MIN_VALUE;
 					for (Gotchi gotchi: gr.getGotchisOwned()) {
 						int gotchiID = Integer.parseInt("" + gotchi.getId());
 						Integer previousKinship = kinshipTracker.get(gotchiID);
@@ -101,10 +104,18 @@ public class GrannyUtils {
 						}
 						if (!previousKinship.equals(gotchi.getKinship())) {
 							if (settings.isHaMode()) {
+								if (settings.isSadNotification()) {
+									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: The kinship got updated without grannys touch ..");
+									LOGGER.info("Pushing status update to SAD");
+								}
 								LOGGER.info("The kinship got updated without grannys touch..");
 							} else {
 								LOGGER.warn("Strange, the kinship got updated without grannys touch.. enable haMode if you want this warning to go away");
 								LOGGER.warn(gotchi.getName() + " previousKinship: " + previousKinship + " gotchi.getKinship(): " + gotchi.getKinship());
+								if (settings.isSadNotification()) {
+									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "WARNING: Strange, the kinship got updated without grannys touch.. enable haMode if you want this warning to go away");
+									LOGGER.info("Pushing status update to SAD");
+								}
 							}
 						}
 						kinshipTracker.put(gotchiID, gotchi.getKinship());
@@ -112,6 +123,7 @@ public class GrannyUtils {
 
 						Long diffInSeconds = System.currentTimeMillis()/1000L - Long.parseLong("" + gotchi.getLastInteracted());
 						Long timeUntilPet = (12L*3600L) - diffInSeconds;
+						if (timeUntilPet > maxtimeUntilPet) maxtimeUntilPet = timeUntilPet;
 						gotchi.setTimeUntilPet(timeUntilPet);
 						if (minTimeUntilPet > timeUntilPet) minTimeUntilPet = timeUntilPet;
 
@@ -154,12 +166,16 @@ public class GrannyUtils {
 						continueWithHugs = true;
 					} else {
 						if (!summaryHugsSoonNeeded.isEmpty()) {
-							LOGGER.info(".... micro sleeping 60 seconds to let gotchis catchup");
-							SystemUtils.sleepInSeconds(60);
+							LOGGER.info(".... mini sleeping 30 seconds to let gotchis catchup");
+							SystemUtils.sleepInSeconds(30);
 						} else if (minTimeUntilPet <= 60L) {
 							LOGGER.info(".... micro sleeping 5 seconds since we are about to pet");
 							SystemUtils.sleepInSeconds(5);
 						} else {
+							if (settings.isSadNotification()) {
+								SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "HB: We still need to wait " + DateUtils.secondsToHours(maxtimeUntilPet) + " h (" + maxtimeUntilPet + " seconds) before next pet");
+								LOGGER.info("Pushing status update to SAD");
+							}
 							LOGGER.info(".... sleeping " + settings.getTheGraphPollFrequencyInSeconds() + " seconds");
 							SystemUtils.sleepInSeconds(settings.getTheGraphPollFrequencyInSeconds());
 						}

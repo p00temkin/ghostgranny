@@ -6,10 +6,9 @@ import java.nio.ByteBuffer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -271,7 +270,7 @@ public class Start {
 		Option sadurl = new Option("s", "sadurl", true, "SAD URL");
 		options.addOption(sadurl);
 		
-		HelpFormatter formatter = new HelpFormatter();
+		HelpFormatter formatter = HelpFormatter.builder().get();
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd;
 		try {
@@ -294,7 +293,7 @@ public class Start {
 			
 			if (!cmd.hasOption("g") && !cmd.hasOption("m") && !cmd.hasOption("k")) {
 				LOGGER.error("You must specify either -g, -k or -m to make granny take action");
-				formatter.printHelp(" ", options);
+				formatter.printHelp(" ", " ", options, "", false);
 				SystemUtils.halt();
 			}
 
@@ -303,9 +302,8 @@ public class Start {
 				settings.setHaltOnUnconfirmedTX(false);
 			}
 
-		} catch (ParseException e) {
-			LOGGER.error("ParseException: " + e.getMessage());
-			formatter.printHelp(" ", options);
+		} catch (Exception e) {
+			LOGGER.error("Exception: " + e.getMessage());
 			SystemUtils.halt();
 		}
 
