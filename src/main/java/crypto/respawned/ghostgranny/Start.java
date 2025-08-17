@@ -175,6 +175,13 @@ public class Start {
 				}
 				if (gotchisBumped == 0) {
 					tx_but_still_fail_counter++;
+					String msg = "WARN: We performed a successful pet tx but no gotchis increased their kinship .. might be due to graph update delays so holding off " + tx_but_still_fail_counter + "x300 seconds";
+					LOGGER.warn(msg);
+					SystemUtils.sleepInSeconds(tx_but_still_fail_counter*300);
+					if (settings.isSadNotification()) {
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", msg);
+						LOGGER.info("Pushing status update to SAD");
+					}
 				} else {
 					if (settings.isSadNotification()) {
 						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: Just performed pet with tx " + StringsUtils.cutAndPadStringToN(txHASH, 30) + "..");
