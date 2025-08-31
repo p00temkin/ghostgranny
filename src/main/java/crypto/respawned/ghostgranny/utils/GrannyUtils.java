@@ -105,7 +105,7 @@ public class GrannyUtils {
 						if (!previousKinship.equals(gotchi.getKinship())) {
 							if (settings.isHaMode()) {
 								if (settings.isSadNotification()) {
-									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: The kinship got updated without grannys touch ..");
+									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: The kinship got updated without grannys touch ..", settings.getTheGraphPollFrequencyInSeconds()+10);
 									LOGGER.info("Pushing status update to SAD");
 								}
 								LOGGER.info("The kinship got updated without grannys touch..");
@@ -113,7 +113,7 @@ public class GrannyUtils {
 								LOGGER.warn("Strange, the kinship got updated without grannys touch.. enable haMode if you want this warning to go away");
 								LOGGER.warn(gotchi.getName() + " previousKinship: " + previousKinship + " gotchi.getKinship(): " + gotchi.getKinship());
 								if (settings.isSadNotification()) {
-									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "WARNING: Strange, the kinship got updated without grannys touch.. enable haMode if you want this warning to go away");
+									SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "WARNING: Strange, the kinship got updated without grannys touch.. enable haMode if you want this warning to go away", settings.getTheGraphPollFrequencyInSeconds()+10);
 									LOGGER.info("Pushing status update to SAD");
 								}
 							}
@@ -165,15 +165,12 @@ public class GrannyUtils {
 					if ((summaryHugsNeeded.size()>0) && (summaryHugsSoonNeeded.isEmpty())) {
 						continueWithHugs = true;
 					} else {
-						if (!summaryHugsSoonNeeded.isEmpty()) {
-							LOGGER.info(".... mini sleeping 30 seconds to let gotchis catchup");
-							SystemUtils.sleepInSeconds(30);
-						} else if (minTimeUntilPet <= 60L) {
+						if (minTimeUntilPet <= 60L) {
 							LOGGER.info(".... micro sleeping 5 seconds since we are about to pet");
 							SystemUtils.sleepInSeconds(5);
 						} else {
 							if (settings.isSadNotification()) {
-								SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "HB: We still need to wait " + DateUtils.secondsToHours(maxtimeUntilPet) + " h (" + maxtimeUntilPet + " seconds) before next pet");
+								SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "HB: Need to wait " + DateUtils.secondsToHours(maxtimeUntilPet) + " h (" + maxtimeUntilPet + " sec) before next pet", settings.getTheGraphPollFrequencyInSeconds()+10);
 								LOGGER.info("Pushing status update to SAD");
 							}
 							LOGGER.info(".... sleeping " + settings.getTheGraphPollFrequencyInSeconds() + " seconds");

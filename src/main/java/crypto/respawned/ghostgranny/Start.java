@@ -92,7 +92,7 @@ public class Start {
 			LOGGER.info("In " + randSleep + " seconds granny will cuddle with the following gotchis: " + settings.getTokenIDs().toString());
 			SystemUtils.sleepInSeconds(randSleep);
 			if (settings.isSadNotification()) {
-				SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: In " + randSleep + " seconds granny will cuddle with the following gotchis ..");
+				SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: In " + randSleep + " seconds granny will cuddle with the following gotchis ..", randSleep+10);
 				LOGGER.info("Pushing status update to SAD");
 			}
 
@@ -179,12 +179,12 @@ public class Start {
 					LOGGER.warn(msg);
 					SystemUtils.sleepInSeconds(tx_but_still_fail_counter*300);
 					if (settings.isSadNotification()) {
-						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", msg);
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", msg, settings.getTheGraphPollFrequencyInSeconds()+10);
 						LOGGER.info("Pushing status update to SAD");
 					}
 				} else {
 					if (settings.isSadNotification()) {
-						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: Just performed pet with tx " + StringsUtils.cutAndPadStringToN(txHASH, 30) + "..");
+						SADUtils.blindUpdate(settings.getSadURL(), "GhostGRANNY", "OK: Just performed pet with tx " + StringsUtils.cutAndPadStringToN(txHASH, 30) + "..", settings.getTheGraphPollFrequencyInSeconds()+10);
 						LOGGER.info("Pushing status update to SAD");
 					}
 				}
@@ -258,7 +258,7 @@ public class Start {
 		options.addOption(haMode);
 
 		// forcepet
-		Option forcepet = new Option("o", "forcepet", false, "Override and force pet gotchis");
+		Option forcepet = new Option("f", "forcepet", false, "Override and force pet gotchis");
 		options.addOption(forcepet);
 
 		// extradelay
@@ -289,6 +289,7 @@ public class Start {
 			if (cmd.hasOption("i")) settings.setPetMethodID(cmd.getOptionValue("petfuncaddr"));
 			if (cmd.hasOption("p")) settings.setProviderURL(cmd.getOptionValue("providerurl"));
 			if (cmd.hasOption("x")) settings.setHaMode(true);
+			if (cmd.hasOption("f")) settings.setForcePetAll(true);
 			if (cmd.hasOption("e")) settings.setExtraDelay(Integer.parseInt(cmd.getOptionValue("extradelay")));
 			if (cmd.hasOption("o")) settings.setTheGraphPollFrequencyInSeconds(Integer.parseInt(cmd.getOptionValue("graphpollfrequency")));
 			if (cmd.hasOption("c")) settings.setThresholdForGotchiToCatchUpInSeconds(Integer.parseInt(cmd.getOptionValue("gotchicatchupthreshold")));
